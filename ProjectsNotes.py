@@ -9,9 +9,8 @@ from PyQt5.QtCore import QCoreApplication
 
 class ProjectsNotes(QWidget):
 
-    version = '0.1'
+    version = '0.3'
     projects_folder_name = 'projects'
-
 
     def saveNote(self):
 
@@ -19,21 +18,23 @@ class ProjectsNotes(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.initUI()
+        self.init_ui()
 
 
         #progName.setText(u'Установлено')
 
-    def initUI(self):
+    def init_ui(self):
         global progName
         global nameEdit
         global noteContent
         global selectBox
         global searchInput
+        global searchContent
 
-        progName = QLabel(u'Projects Notes', self)
+        progName = QLabel(u'ProjectsNotes', self)
 
-        copyright_string = QLabel(u'KLEEEEEER\'s Shitcode 2018', self)
+        copyright_string = QLabel(u'<a href="https://github.com/KLEEEEEER">https://github.com/KLEEEEEER</a>', self)
+        copyright_string.setOpenExternalLinks(True)
 
         projectsLabel = QLabel(u'Проект:', self)
         projects = self.getProjects()
@@ -93,9 +94,9 @@ class ProjectsNotes(QWidget):
         grid.addWidget(progName, 4, 1)
         grid.addWidget(dobtn, 5, 1)
         grid.addWidget(search, 1, 3)
-        grid.addWidget(searchInput, 1, 4)
-        grid.addWidget(searchContent, 2, 3, 5, 2)
-        grid.addWidget(searchButton, 1, 5)
+        grid.addWidget(searchInput, 1, 4, 1, 2)
+        grid.addWidget(searchContent, 2, 3, 5, 3)
+        grid.addWidget(searchButton, 7, 5)
 
         grid.addWidget(qbtn, 3, 2)
         grid.addWidget(copyright_string, 8, 1)
@@ -163,20 +164,39 @@ class ProjectsNotes(QWidget):
         progName.setText(u'Сохранён файл ' + file_name)
 
     def searchStringButton(self):
-        self.searchString(searchInput.text())
+        print('start')
+        searchResult = self.searchString(searchInput.text())
+        print('start2')
+        self.fillSearchResult(searchResult)
 
     def searchString(self, string):
-        projects = self.getProjects()
+        searchContent.setText('')
         searchResult = []
+
+        if (string == ''):
+            searchResult.append('Строка поиска пуста')
+            return searchResult
+
+        projects = self.getProjects()
         for project in projects:
             if os.path.isdir(self.projects_folder_name + '/' + project):
                 for file in os.listdir(self.projects_folder_name + '/' + project):
                     if file.endswith('.txt'):
-                        with io.open(self.projects_folder_name + '/' + project + '/' + file, encoding='utf-8') as file_txt:
-                            for line in file_txt:
-                                if string in line:
-                                    searchResult.append(self.projects_folder_name + '/' + project + '/' + file)
+                        line_number = 1
+                        with io.open(self.projects_folder_name + '/' + project + '/' + file) as file_txt: # , encoding='utf-8'
+                            if (file_txt):
+                                for line in file_txt:
+                                    if line.find(string) != -1:
+                                        print('found ' + string)
+                                        searchResult.append('- '+self.projects_folder_name + '/' + project + '/' + file + ' : line ' + str(line_number))
+                                        searchResult.append('\n')
+                                    line_number += 1
         return searchResult
+
+    def fillSearchResult(self, searchResult):
+        for result in searchResult:
+            searchContent.setText(searchContent.toPlainText() + result + '\n')
+        pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
