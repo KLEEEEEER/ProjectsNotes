@@ -36,17 +36,17 @@ class ProjectsNotes(QWidget):
         copyright_string = QLabel(u'<a href="https://github.com/KLEEEEEER">https://github.com/KLEEEEEER</a>', self)
         copyright_string.setOpenExternalLinks(True)
 
-        projectsLabel = QLabel(u'Проект:', self)
+        projectsLabel = QLabel(u'Project:', self)
         projects = self.getProjects()
 
         selectBox = QComboBox()
         selectBox.addItems(projects)
 
-        qbtn = QPushButton('Обновить проекты', self)
+        qbtn = QPushButton('Update projects', self)
         qbtn.clicked.connect(self.updateProjects)
         qbtn.resize(qbtn.sizeHint())
 
-        clearbtn = QPushButton('Очистить все поля', self)
+        clearbtn = QPushButton('Clear all fields', self)
         clearbtn.clicked.connect(self.clearInputs)
         clearbtn.resize(qbtn.sizeHint())
 
@@ -58,23 +58,23 @@ class ProjectsNotes(QWidget):
             global rowsChanged
             nameChanged = nameEdit.text()
             rowsChanged = noteContent.text()
-            print('TextChanged and now its: ' + nameEdit.text())
-            print('TextChanged and now its: ' + noteContent.toPlainText())
+            #print('TextChanged and now its: ' + nameEdit.text())
+            #print('TextChanged and now its: ' + noteContent.toPlainText())
 
-        dobtn = QPushButton('Создать заметку', self)
+        dobtn = QPushButton('Create note', self)
         dobtn.clicked.connect(self.saveProjectNote)
         dobtn.resize(dobtn.sizeHint())
         dobtn.move(0, 0)
 
 
-        name = QLabel('Имя:')
+        name = QLabel('Name:')
         nameEdit = QLineEdit()
 
-        rowsCount = QLabel('Текст:')
+        rowsCount = QLabel('Text:')
         noteContent = QTextEdit()
 
-        searchButton = QPushButton('Найти', self)
-        search = QLabel('Поиск')
+        searchButton = QPushButton('Search', self)
+        search = QLabel('Search:')
         searchInput = QLineEdit()
         searchContent = QTextEdit()
         searchButton.clicked.connect(self.searchStringButton)
@@ -114,7 +114,7 @@ class ProjectsNotes(QWidget):
         try:
             os.makedirs(self.projects_folder_name)
         except OSError:
-            progName.setText(u'Ошибка загрузки папок в ' + self.projects_folder_name)
+            progName.setText(u'Files loaded from ./' + self.projects_folder_name)
 
         projects = []
         projects_array = os.listdir(self.projects_folder_name)
@@ -137,20 +137,20 @@ class ProjectsNotes(QWidget):
     def saveProjectNote(self):
 
         if (str(nameEdit.text()) == ''):
-            progName.setText(u'Не введено имя заметки')
+            progName.setText(u'Name is empty')
             return
 
         if (str(noteContent.toPlainText()) == ''):
-            progName.setText(u'Не введен текст заметки')
+            progName.setText(u'Text is empty')
             return
 
         if ( str(selectBox.currentText()) == '' ):
-            progName.setText(u'Не создано папок проектов, создайте её в папке ' + self.projects_folder_name + ' и нажмите Обновить проекты')
+            progName.setText(u'You have no projects, add them in folder ' + self.projects_folder_name + ' and press "Update projects"')
             return
 
         if not os.path.isdir(self.projects_folder_name + '/' + str(selectBox.currentText())):
             self.updateProjects()
-            progName.setText(u'Проекта ' + str(selectBox.currentText()) + ' больше не существует. Список проектов обновлён.')
+            progName.setText(u'Project ' + str(selectBox.currentText()) + ' is no longer exists. Projects list updated.')
             return
 
 
@@ -161,7 +161,7 @@ class ProjectsNotes(QWidget):
         document = open(project_path + file_name, 'w')
         document.write(str(noteContent.toPlainText()))
         document.close()
-        progName.setText(u'Сохранён файл ' + file_name)
+        progName.setText(u'Saved file ' + file_name)
 
     def searchStringButton(self):
         print('start')
@@ -174,7 +174,7 @@ class ProjectsNotes(QWidget):
         searchResult = []
 
         if (string == ''):
-            searchResult.append('Строка поиска пуста')
+            searchResult.append('Search input is empty')
             return searchResult
 
         projects = self.getProjects()
