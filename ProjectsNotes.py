@@ -9,7 +9,7 @@ from PyQt5.QtCore import QCoreApplication
 
 class ProjectsNotes(QWidget):
 
-    version = '0.3'
+    version = '0.4'
     projects_folder_name = 'projects'
 
     def saveNote(self):
@@ -170,6 +170,7 @@ class ProjectsNotes(QWidget):
         self.fillSearchResult(searchResult)
 
     def searchString(self, string):
+        string = string.lower()
         searchContent.setText('')
         searchResult = []
 
@@ -182,11 +183,18 @@ class ProjectsNotes(QWidget):
             if os.path.isdir(self.projects_folder_name + '/' + project):
                 for file in os.listdir(self.projects_folder_name + '/' + project):
                     if file.endswith('.txt'):
+                        file_name_low = str(file.title()).lower()
+                        if string in file_name_low:
+                            searchResult.append(
+                                '- ' + self.projects_folder_name + '/' + project + '/' + file)
+                            searchResult.append('\n')
+                            continue
                         line_number = 1
                         with io.open(self.projects_folder_name + '/' + project + '/' + file) as file_txt: # , encoding='utf-8'
                             if (file_txt):
                                 for line in file_txt:
-                                    if line.find(string) != -1:
+                                    line_check = line.lower()
+                                    if string in line_check:
                                         print('found ' + string)
                                         searchResult.append('- '+self.projects_folder_name + '/' + project + '/' + file + ' : line ' + str(line_number))
                                         searchResult.append('\n')
