@@ -1,7 +1,7 @@
 # ProjectsNotes
 Simple python desktop app for making formatted txt notes of working projects
 
-##Building exe file
+## Building exe file
 
 To build exe file you need to install Pyinstaller first:
 ```

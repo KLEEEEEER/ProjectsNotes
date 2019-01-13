@@ -5,7 +5,8 @@ import datetime
 import sys
 from PyQt5.QtWidgets import QInputDialog, QApplication, QWidget, QPushButton, QLabel, QLineEdit, QComboBox, QTextEdit, QGridLayout, QProgressBar
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import QCoreApplication, QThread
+from threading import Thread
 
 class ProjectsNotes(QWidget):
 
@@ -168,9 +169,9 @@ class ProjectsNotes(QWidget):
         progName.setText(u'Saved file ' + file_name)
 
     def searchStringButton(self):
-        print('start')
+        print('start searching')
         searchResult = self.searchString(searchInput.text())
-        print('start2')
+        print('end searching')
         self.fillSearchResult(searchResult)
 
     def searchString(self, string):
