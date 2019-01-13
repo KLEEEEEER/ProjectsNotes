@@ -3,7 +3,7 @@ import os
 import io
 import datetime
 import sys
-from PyQt5.QtWidgets import QInputDialog, QApplication, QWidget, QPushButton, QLabel, QLineEdit, QComboBox, QTextEdit, QGridLayout
+from PyQt5.QtWidgets import QInputDialog, QApplication, QWidget, QPushButton, QLabel, QLineEdit, QComboBox, QTextEdit, QGridLayout, QProgressBar
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QCoreApplication
 
@@ -30,6 +30,7 @@ class ProjectsNotes(QWidget):
         global selectBox
         global searchInput
         global searchContent
+        global searchProgressBar
 
         progName = QLabel(u'ProjectsNotes', self)
 
@@ -79,6 +80,8 @@ class ProjectsNotes(QWidget):
         searchContent = QTextEdit()
         searchButton.clicked.connect(self.searchStringButton)
 
+        searchProgressBar = QProgressBar(self)
+
        # nameEdit.textChanged[str].connect(ChangedName)
         #noteContent.textChanged[str].connect(ChangedName)
 
@@ -97,6 +100,7 @@ class ProjectsNotes(QWidget):
         grid.addWidget(searchInput, 1, 4, 1, 2)
         grid.addWidget(searchContent, 2, 3, 5, 3)
         grid.addWidget(searchButton, 7, 5)
+        grid.addWidget(searchProgressBar, 7, 4)
 
         grid.addWidget(qbtn, 3, 2)
         grid.addWidget(copyright_string, 8, 1)
@@ -179,6 +183,11 @@ class ProjectsNotes(QWidget):
             return searchResult
 
         projects = self.getProjects()
+
+        projectBarIteration = int(100/len(projects))
+        currentProgressBarPosition = 0
+        searchProgressBar.reset()
+
         for project in projects:
             if os.path.isdir(self.projects_folder_name + '/' + project):
                 for file in os.listdir(self.projects_folder_name + '/' + project):
@@ -199,11 +208,14 @@ class ProjectsNotes(QWidget):
                                         searchResult.append('- '+self.projects_folder_name + '/' + project + '/' + file + ' : line ' + str(line_number))
                                         searchResult.append('\n')
                                     line_number += 1
+            currentProgressBarPosition = currentProgressBarPosition + projectBarIteration
+            searchProgressBar.setValue(currentProgressBarPosition)
         return searchResult
 
     def fillSearchResult(self, searchResult):
         for result in searchResult:
             searchContent.setText(searchContent.toPlainText() + result + '\n')
+        searchProgressBar.setValue(100)
         pass
 
 if __name__ == '__main__':
