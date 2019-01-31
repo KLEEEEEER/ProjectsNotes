@@ -6,16 +6,12 @@ import sys
 from PyQt5.QtWidgets import QInputDialog, QApplication, QWidget, QPushButton, QLabel, QLineEdit, QComboBox, QTextEdit, QGridLayout, QProgressBar
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QCoreApplication, QThread
-from threading import Thread
+import threading
 
 class ProjectsNotes(QWidget):
 
     version = '0.4'
     projects_folder_name = 'projects'
-
-    def saveNote(self):
-
-        return 0
 
     def __init__(self):
         super().__init__()
@@ -52,17 +48,6 @@ class ProjectsNotes(QWidget):
         clearbtn.clicked.connect(self.clearInputs)
         clearbtn.resize(qbtn.sizeHint())
 
-        nameChanged = ''
-        rowsChanged = ''
-
-        def ChangedName():
-            global nameChanged
-            global rowsChanged
-            nameChanged = nameEdit.text()
-            rowsChanged = noteContent.text()
-            #print('TextChanged and now its: ' + nameEdit.text())
-            #print('TextChanged and now its: ' + noteContent.toPlainText())
-
         dobtn = QPushButton('Create note', self)
         dobtn.clicked.connect(self.saveProjectNote)
         dobtn.resize(dobtn.sizeHint())
@@ -82,9 +67,6 @@ class ProjectsNotes(QWidget):
         searchButton.clicked.connect(self.searchStringButton)
 
         searchProgressBar = QProgressBar(self)
-
-       # nameEdit.textChanged[str].connect(ChangedName)
-        #noteContent.textChanged[str].connect(ChangedName)
 
         grid = QGridLayout()
         grid.setSpacing(10)
@@ -106,14 +88,12 @@ class ProjectsNotes(QWidget):
         grid.addWidget(qbtn, 3, 2)
         grid.addWidget(copyright_string, 8, 1)
 
-
         self.setLayout(grid)
 
         self.setGeometry(300, 300, 600, 200)
         self.setWindowTitle('Projects Notes v' + self.version)
         self.setWindowIcon(QIcon('icon.png'))
         self.show()
-
 
     def getProjects(self):
         try:
@@ -170,18 +150,23 @@ class ProjectsNotes(QWidget):
 
     def searchStringButton(self):
         print('start searching')
-        searchResult = self.searchString(searchInput.text())
-        print('end searching')
-        self.fillSearchResult(searchResult)
+        #searchResult = self.searchString(searchInput.text())
+        print(searchInput.text())
+
+        searchThread = threading.Thread(target=self.searchString, args=(searchInput.text(),))
+        searchThread.start()
+
+        #print('end searching. ' + str(len(searchResult)) + ' entries founded')
 
     def searchString(self, string):
+        print('start searchString')
         string = string.lower()
         searchContent.setText('')
         searchResult = []
 
         if (string == ''):
             searchResult.append('Search input is empty')
-            return searchResult
+            pass
 
         projects = self.getProjects()
 
@@ -189,6 +174,7 @@ class ProjectsNotes(QWidget):
         currentProgressBarPosition = 0
         searchProgressBar.reset()
 
+        print('start for loop')
         for project in projects:
             if os.path.isdir(self.projects_folder_name + '/' + project):
                 for file in os.listdir(self.projects_folder_name + '/' + project):
@@ -211,7 +197,7 @@ class ProjectsNotes(QWidget):
                                     line_number += 1
             currentProgressBarPosition = currentProgressBarPosition + projectBarIteration
             searchProgressBar.setValue(currentProgressBarPosition)
-        return searchResult
+        self.fillSearchResult(searchResult)
 
     def fillSearchResult(self, searchResult):
         for result in searchResult:
